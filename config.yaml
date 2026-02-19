@@ -1,0 +1,7 @@
+# config.yaml
+telegram:
+  bot_token: ""
+  chat_id: ""
+services:
+  - nginx
+check_interval: 10
