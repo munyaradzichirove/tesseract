@@ -12,17 +12,35 @@ BOT_TOKEN = cfg['telegram']['bot_token']
 CHAT_ID = cfg['telegram']['chat_id']
 SERVICES = cfg.get('services', [])
 CHECK_INTERVAL = cfg.get('check_interval', 60)
+GLOBAL_AUTORESTART = cfg.get('autorestart', False)
 
-def send_alert(service_name):
-    msg = f"Tesseract Alert: Service {service_name} is down!"
+def send_alert(message):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    requests.post(url, data={"chat_id": CHAT_ID, "text": msg})
+    requests.post(url, data={"chat_id": CHAT_ID, "text": message})
 
 def check_service(service_name):
-    result = subprocess.run(["systemctl", "is-active", service_name],
-                            capture_output=True, text=True)
-    if result.stdout.strip() != "active":
-        send_alert(service_name)
+    result = subprocess.run(
+        ["systemctl", "is-active", service_name],
+        capture_output=True, text=True
+    )
+    status = result.stdout.strip()
+
+    if status != "active":
+        if GLOBAL_AUTORESTART:
+            send_alert(f"Tesseract Alert: Service {service_name} is down, attempting restart...")
+            subprocess.run(["systemctl", "restart", service_name])
+            # check again
+            result = subprocess.run(
+                ["systemctl", "is-active", service_name],
+                capture_output=True, text=True
+            )
+            status = result.stdout.strip()
+            if status == "active":
+                send_alert(f"Tesseract Alert: Service {service_name} has been restored ✅")
+            else:
+                send_alert(f"Tesseract Alert: Service {service_name} is still down ❌")
+        else:
+            send_alert(f"Tesseract Alert: Service {service_name} is down ❌")
 
 if __name__ == "__main__":
     while True:

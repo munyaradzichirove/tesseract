@@ -1,7 +1,11 @@
-# config.yaml
 telegram:
   bot_token: ""
   chat_id: ""
+
+# Global autorestart for all services
+autorestart: true
+
 services:
   - nginx
+
 check_interval: 10
