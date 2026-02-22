@@ -54,6 +54,8 @@ telegram:
   bot_token: "YOUR_BOT_TOKEN"
   chat_id: "YOUR_CHAT_ID"
 
+autorestart: true
+
 services:
   - nginx
   - tesseract
