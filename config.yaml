@@ -8,4 +8,4 @@ autorestart: true
 services:
   - nginx
 
-check_interval: 10
+check_interval: 30
