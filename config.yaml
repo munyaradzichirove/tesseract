@@ -1,11 +1,11 @@
 telegram:
   bot_token: ""
   chat_id: ""
-
 # Global autorestart for all services
-autorestart: true
+autorestart: false
+service_sleep: 1   # 1 second between each service check
 
 services:
   - nginx
-
-check_interval: 30
+  - mariadb
+check_interval: 10
